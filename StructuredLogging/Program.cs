@@ -10,17 +10,13 @@
 namespace StructuredLogging
 {
     using System;
-    using System.Collections.Generic;
     using System.Configuration;
-    using System.Text;
-    using System.Threading.Tasks;
 
     /// <summary>
     /// The program.
     /// </summary>
     public class Program
     {
-
         /// <summary>
         /// The logger we will use to log transactions to help with debugging.
         /// </summary>
@@ -54,10 +50,27 @@ namespace StructuredLogging
         /// </summary>
         private static void LogSamples()
         {
-            // Demonstrate Property
-            // long4net.config 
+            // The global context is shared by all threads in the current AppDomain. This context is thread
+            // safe for use by multiple threads concurrently.  We can create these as needed and add these
+            // into layout pattern or have the ability to remove from the layout pattern.
+            // https://logging.apache.org/log4net/release/manual/contexts.html
             log4net.GlobalContext.Properties["EntityName"] = EntityName;
+            log4net.GlobalContext.Properties["AllocatedBytes"] = new StructuredMessage.GcAllocatedBytesHelper();
+
             Logger.Info(MyLogMessage.GetMessage(Guid.NewGuid().ToString(), "LogSamples"));
+            Logger.InfoFormat(MyLogMessage.GetMessage(Guid.NewGuid().ToString(), "LogSamples"));
+
+            Logger.Debug(MyLogMessage.GetMessage(Guid.NewGuid().ToString(), "LogSamples"));
+            Logger.DebugFormat(MyLogMessage.GetMessage(Guid.NewGuid().ToString(), "LogSamples"));
+
+            Logger.Error(MyLogMessage.GetMessage(Guid.NewGuid().ToString(), "LogSamples"));
+            Logger.ErrorFormat(MyLogMessage.GetMessage(Guid.NewGuid().ToString(), "LogSamples"));
+
+            Logger.Fatal(MyLogMessage.GetMessage(Guid.NewGuid().ToString(), "LogSamples"));
+            Logger.FatalFormat(MyLogMessage.GetMessage(Guid.NewGuid().ToString(), "LogSamples"));
+
+            Logger.Warn(MyLogMessage.GetMessage(Guid.NewGuid().ToString(), "LogSamples"));
+            Logger.WarnFormat(MyLogMessage.GetMessage(Guid.NewGuid().ToString(), "LogSamples"));
         }
     }
 }

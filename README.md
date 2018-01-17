@@ -1,6 +1,6 @@
 # Structured Logging
 
-Using C#, log4net, Filebeat, ELK (elasticsearch, logstash, kibana).  The windows way.  :-(
+Using C#, log4net, Filebeat, ELK (elasticsearch, logstash, kibana).  {.Net Environment}
 
 Quick Review
 
@@ -21,26 +21,22 @@ use these logs to monitor and troubleshoot applications.
 - right click solution and add new item, general, config, and name file log4net.config
 - click on log4net.config and set properties in the VS Window, to Copy to Output Directory = Always, or if newer.
 
-We use Newtonsoft.Json to generate the json from our C# objects.  Having the json generated this way 
+We use Newtonsoft.Json to generate the json from our C# objects.  Having the json generated this way
 is much safer then building strings which might contain characters we would have to strip out and replace.
 Invalid characters will create invalid Json.
 
 ## Add assemnbly info for log4net
 
 ```csharp
-
 // Manually Add of log4net by Craig Nicholson
 // [assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config")]
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = "Log4net.config", Watch = true)]
-
 ```
 
 - Add reference to Logger in program.cs
 
 ```csharp
-
-        private static readonly log4net.ILog Logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
+private static readonly log4net.ILog Logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 ```
 
 ## Update log4net.config
@@ -78,10 +74,13 @@ Typical log4net.config file
 
 ```
 
-This log4net.config is setup to output JSON to the logs.
+The following log4net.config is setup to output JSON to the logs.
 
-- Write output to the console
-- Write output to the logs/ directory
+- Writes output to the console
+- Writes output to the logs/ directory
+
+There are more appenders we need to review and see what interesting things we can do with the other appenders.
+https://logging.apache.org/log4net/release/manual/introduction.html#appenders
 
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
@@ -113,7 +112,7 @@ This log4net.config is setup to output JSON to the logs.
 
 ## Log Aggreations
 
-### Install for Production
+### Install for Production on Windows Server
 
 - Java http://www.oracle.com/technetwork/java/javase/downloads/jdk9-downloads-3848520.html
 - ElasticSearch (http://localhost:9200/)
@@ -386,3 +385,7 @@ https://www.loggly.com/docs/net-logs/
 https://nxlog.co/documentation/nxlog-user-guide#what-nxlog-is-not - fowards logs to aggregation UI - like loggly
 https://stackify.com/best-log-management-tools/
 https://stackify.com/csharp-logging-best-practices/
+
+## Referennces
+
+https://blog.rapid7.com/2016/04/27/how-to-ensure-self-describing-log-data-using-log4net/

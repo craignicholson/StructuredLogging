@@ -111,6 +111,24 @@ namespace StructuredLogging
         private object ObjectType { get; set; }
 
         /// <summary>
+        /// Garbage Collector get allocated bytes helper.
+        /// Trying another way to demonstrate use case.
+        /// </summary>
+        public class GcAllocatedBytesHelper
+        {
+            /// <summary>
+            /// The to string.
+            /// </summary>
+            /// <returns>
+            /// The <see cref="string"/>.
+            /// </returns>
+            public override string ToString()
+            {
+                return GC.GetTotalMemory(true).ToString();
+            }
+        }
+
+        /// <summary>
         /// The get message.
         /// </summary>
         /// <param name="correlationId">
