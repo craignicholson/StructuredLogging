@@ -4,8 +4,8 @@ Using C#, log4net, Filebeat, ELK (elasticsearch, logstash, kibana).  {.Net Envir
 
 Quick Review
 
-1. Logs come from the apps in various formats.
-1. Filebeat soaks up the logs and monitors other stuff on the server and send it to LogStash
+1. Logs come from the apps in various formats.  Having a defined schema for logs is a good thing. We will do this with json.
+1. Filebeat soaks up the logs and monitors other stuff on the server and send it to LogStash.
 1. LogStash converts it all to a common format and sends it to ElasticSearch.
 1. We use Kibana to make cool graphs and analyze what's in ElasticSearch.
 
@@ -13,13 +13,17 @@ Our goal is to create a structured log which is a collection of the same fields 
 use across all applications.  The goal is send all logs to one system so operations can
 use these logs to monitor and troubleshoot applications.
 
-## Setup Project
+## Setup for this Project
 
-- Add log4net using the NuGet Package Manager
-- Newtonsoft.Json
-- Add code block to AssemblyInfo.cs file
-- right click solution and add new item, general, config, and name file log4net.config
-- click on log4net.config and set properties in the VS Window, to Copy to Output Directory = Always, or if newer.
+If you want to create your own project or add the same to an existing one below are the steps needed.
+
+1. Add log4net using the NuGet Package Manager
+1. Add Newtonsoft.Json using the NuGet Package Manager
+1. Add code block to AssemblyInfo.cs file
+1. Add a log4net.config file with a right click solution and add new item, general, config, and name file log4net.config
+1. Click on log4net.config and set properties in the VS Window, to Copy to Output Directory = Always, or if newer.
+1. Copy and Paste the xml data below into the log4.net.config file.
+1. Add class file StucturedMessage.cs
 
 We use Newtonsoft.Json to generate the json from our C# objects.  Having the json generated this way
 is much safer then building strings which might contain characters we would have to strip out and replace.
@@ -29,7 +33,6 @@ Invalid characters will create invalid Json.
 
 ```csharp
 // Manually Add of log4net by Craig Nicholson
-// [assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config")]
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = "Log4net.config", Watch = true)]
 ```
 
@@ -110,38 +113,58 @@ https://logging.apache.org/log4net/release/manual/introduction.html#appenders
 </log4net>
 ```
 
-## Log Aggreations
+## Example of a JSON log output
 
-### Install for Production on Windows Server
+```Json
+{
+    "EntryDate": "2018-01-17 11:39:13,644",
+    "thread": "[WorkPool-Session#1:Connection(2b0af7b7-f141-4525-b3af-d982863aafd7,amqp://etss-appdev:5672)]",
+    "Level": "INFO ",
+    "EntityName": "ElectSolve",
+    "Message": {
+        "environmentVariables": {
+            "machineName": "DESKTOP-L2HKL4V",
+            "ipAddress": "fe80::8957:cd3f:cbeb:7ef9%6",
+            "operatingSystem": "Microsoft Windows NT 6.2.9200.0",
+            "userName": "SYSTEM",
+            "userDomainName": "WORKGROUP",
+            "totalMemory": 1076608,
+            "workingSet": 53874688
+        },
+        "appName": "OutageEventChangedNotificationConsumerService.exe",
+        "correlationId": "d488fd0d-5b0b-4ae1-ada0-859d9e038e1b",
+        "methodName": "ListenForHeartbeat",
+        "message": "Heartbeat Received!",
+        "error": null,
+        "stackTrace": null,
+        "elapsedMilliseconds": 0,
+        "localDateTime": "2018-01-17T11:39:13.6441902-05:00",
+        "exceptionReceived": null,
+        "object": null,
+        "objectType": null
+    }
+}
+```
 
-- Java http://www.oracle.com/technetwork/java/javase/downloads/jdk9-downloads-3848520.html
-- ElasticSearch (http://localhost:9200/)
-  --https://www.elastic.co/guide/en/elasticsearch/reference/current/windows.html
-  --https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.1.1.msi
-  --https://stackoverflow.com/questions/22924300/removing-data-from-elasticsearch
-  -- curl -X DELETE 'http://localhost:9200/_all'
-- LogStash on windows
-- Kibana (http://localhost:5601)
-- Filebeat (Runs local on the client)
- --https://www.elastic.co/downloads/beats/filebeat
- -- unzip/tar the package
- -- Run install-service-filebeat.pd1
+## Pipleline to collect log files - Docker
 
-Edit Filebeat yml
+### [Install Docker](https://docs.docker.com/docker-for-windows/install/)
+
+Install Docker and download the ELK Stack
+
+> docker pull sebp/elk
+> docker images
+> docker run -p 5601:5601 -p 9200:9200 -p 5044:5044 -it --name elk sebp/
+> docker ps
+> docker stop my_container
+
+- [Install Filebeat](https://www.elastic.co/downloads/beats/filebeat)
+
+1. Unzip the packatge you downloaded (filebeat-6.1.1-windows-x86_64.zip)
+1. Run Powershell as Administrator on install-service-filebeat.ps1
+1. Create a filebeat.yml or edit the existing file. TODO: Create folder of sample filebeat.yml files.
 
 ```yml
-###################### Filebeat Configuration Example #########################
-
-# This file is an example configuration file highlighting only the most common
-# options. The filebeat.reference.yml file from the same directory contains all the
-# supported options with more comments. You can use it as a reference.
-#
-# You can find the full configuration reference here:
-# https://www.elastic.co/guide/en/beats/filebeat/index.html
-
-# For more available modules and options, please see the filebeat.reference.yml sample
-# configuration file.
-
 #=========================== Filebeat prospectors =============================
 
 filebeat.prospectors:
@@ -157,46 +180,10 @@ filebeat.prospectors:
 
   # Paths that should be crawled and fetched. Glob based paths.
   paths:
-    #- /var/log/*.log
     - C:\Users\craig\source\repos\OutageEventChangedNotificationSolution\OutageEventChangedNotificationConsumerConsole\bin\Debug\log\*
   document_type: craigtest
   json.keys_under_root: true
   json.add_error_key: true
-
-  # Exclude lines. A list of regular expressions to match. It drops the lines that are
-  # matching any regular expression from the list.
-  #exclude_lines: ['^DBG']
-
-  # Include lines. A list of regular expressions to match. It exports the lines that are
-  # matching any regular expression from the list.
-  #include_lines: ['^ERR', '^WARN']
-
-  # Exclude files. A list of regular expressions to match. Filebeat drops the files that
-  # are matching any regular expression from the list. By default, no files are dropped.
-  #exclude_files: ['.gz$']
-
-  # Optional additional fields. These fields can be freely picked
-  # to add additional information to the crawled log files for filtering
-  #fields:
-  #  level: debug
-  #  review: 1
-
-  ### Multiline options
-
-  # Mutiline can be used for log messages spanning multiple lines. This is common
-  # for Java Stack Traces or C-Line Continuation
-
-  # The regexp Pattern that has to be matched. The example pattern matches all lines starting with [
-  #multiline.pattern: ^\[
-
-  # Defines if the pattern set under pattern should be negated or not. Default is false.
-  #multiline.negate: false
-
-  # Match can be set to "after" or "before". It is used to define if lines should be append to a pattern
-  # that was (not) matched before or after or as long as a pattern is not matched based on negate.
-  # Note: After is the equivalent to previous and before is the equivalent to to next in Logstash
-  #multiline.match: after
-
 
 #============================= Filebeat modules ===============================
 
@@ -217,34 +204,6 @@ setup.template.settings:
   #index.codec: best_compression
   #_source.enabled: false
 
-#================================ General =====================================
-
-# The name of the shipper that publishes the network data. It can be used to group
-# all the transactions sent by a single shipper in the web interface.
-#name:
-
-# The tags of the shipper are included in their own field with each
-# transaction published.
-#tags: ["service-X", "web-tier"]
-
-# Optional fields that you can specify to add additional information to the
-# output.
-#fields:
-#  env: staging
-
-
-#============================== Dashboards =====================================
-# These settings control loading the sample dashboards to the Kibana index. Loading
-# the dashboards is disabled by default and can be enabled either by setting the
-# options here, or by using the `-setup` CLI flag or the `setup` command.
-#setup.dashboards.enabled: false
-
-# The URL from where to download the dashboards archive. By default this URL
-# has a value which is computed based on the Beat name and version. For released
-# versions, this URL points to the dashboard archive on the artifacts.elastic.co
-# website.
-#setup.dashboards.url:
-
 #============================== Kibana =====================================
 
 # Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
@@ -256,19 +215,6 @@ setup.kibana:
   # In case you specify and additional path, the scheme is required: http://localhost:5601/path
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
   #host: "localhost:5601"
-
-#============================= Elastic Cloud ==================================
-
-# These settings simplify using filebeat with the Elastic Cloud (https://cloud.elastic.co/).
-
-# The cloud.id setting overwrites the `output.elasticsearch.hosts` and
-# `setup.kibana.host` options.
-# You can find the `cloud.id` in the Elastic Cloud web UI.
-#cloud.id:
-
-# The cloud.auth setting overwrites the `output.elasticsearch.username` and
-# `output.elasticsearch.password` settings. The format is `<user>:<pass>`.
-#cloud.auth:
 
 #================================ Outputs =====================================
 
@@ -298,18 +244,27 @@ output.elasticsearch:
   # Client Certificate Key
   #ssl.key: "/etc/pki/client/cert.key"
 
-#================================ Logging =====================================
-
-# Sets log level. The default log level is info.
-# Available log levels are: critical, error, warning, info, debug
-#logging.level: debug
-
-# At debug level, you can selectively enable logging only for some components.
-# To enable all selectors use ["*"]. Examples of other selectors are "beat",
-# "publish", "service".
-#logging.selectors: ["*"]
-
 ```
+
+### Install for Production on Windows Server
+
+1. Download and install Filebeat
+
+- Java http://www.oracle.com/technetwork/java/javase/downloads/jdk9-downloads-3848520.html
+- ElasticSearch (http://localhost:9200/)
+  --https://www.elastic.co/guide/en/elasticsearch/reference/current/windows.html
+  --https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.1.1.msi
+  --https://stackoverflow.com/questions/22924300/removing-data-from-elasticsearch
+  -- curl -X DELETE 'http://localhost:9200/_all'
+- LogStash on windows
+- Kibana (http://localhost:5601)
+- Filebeat (Runs local on the client)
+ --https://www.elastic.co/downloads/beats/filebeat
+ -- unzip/tar the package
+ -- Run install-service-filebeat.pd1
+
+Edit Filebeat yml
+
 
 > cd C:\Users\craig\Downloads\filebeat-6.1.1-windows-x86_64\filebeat-6.1.1-windows-x86_64
 > install-service-filebeat.pd1
@@ -363,15 +318,7 @@ PS C:\Users\craig\Downloads\filebeat-6.1.1-windows-x86_64\filebeat-6.1.1-windows
   19 Start-Service filebeat
   20 Stop-Service filebeat
 
-### Testing Locally
 
-- Install docker
-
-> docker pull sebp/elk
-> docker images
-> docker run -p 5601:5601 -p 9200:9200 -p 5044:5044 -it --name elk sebp/
-> docker ps
-> docker stop my_container
 
 ### Filebeat
 
