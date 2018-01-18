@@ -10,6 +10,7 @@
 namespace StructuredLogging
 {
     using System;
+    using System.Collections.ObjectModel;
     using System.Configuration;
 
     /// <summary>
@@ -41,7 +42,7 @@ namespace StructuredLogging
         /// </param>
         public static void Main(string[] args)
         {
-            LogSamples();
+            LogInfo();
             Console.ReadLine();
         }
 
@@ -52,8 +53,9 @@ namespace StructuredLogging
         {
             // The global context is shared by all threads in the current AppDomain. This context is thread
             // safe for use by multiple threads concurrently.  We can create these as needed and add these
-            // into layout pattern or have the ability to remove from the layout pattern.
+            // into layout pattern or have the ability to remove from the conversionPattern.
             // https://logging.apache.org/log4net/release/manual/contexts.html
+            // Adding these into the conversionPattern _-> %property{EntityName} and  %property{AllocatedBytes}
             log4net.GlobalContext.Properties["EntityName"] = EntityName;
             log4net.GlobalContext.Properties["AllocatedBytes"] = new StructuredMessage.GcAllocatedBytesHelper();
 
@@ -71,6 +73,46 @@ namespace StructuredLogging
 
             Logger.Warn(MyLogMessage.GetMessage(Guid.NewGuid().ToString(), "LogSamples"));
             Logger.WarnFormat(MyLogMessage.GetMessage(Guid.NewGuid().ToString(), "LogSamples"));
+        }
+
+        private static void LogInfo()
+        {
+            var tz = TimeZoneInfo.GetSystemTimeZones();
+
+            // You can use a correlationId to batch log messages together when a series of actions
+            // represent the same unit of work.  If you are processing data, scrubbing, transforming
+            // and inserting these types of transactions have many steps and could post the data to many
+            // systems and know what is affected down stream is help full.
+            var correlationId = new Guid().ToString();
+            Logger.Info(
+                MyLogMessage.GetMessage(
+                    correlationId: correlationId,
+                    methodName: "Program.LogInfoMethod",
+                    message: "Running LogInfo Test",
+                    error: "IF ONE EXISTS",
+                    stackTrace: "IF YOU WANT IT",
+                    exception: new Exception("Test Exception"),
+                    elapsedMilliseconds: 0,
+                    anyObject: tz));
+        }
+
+        private static void LogErrors()
+        {
+
+        }
+
+        private static void LogFatals()
+        {
+
+        }
+        private static void LogObjects()
+        {
+
+        }
+
+        private static void LogWarn()
+        {
+
         }
     }
 }
