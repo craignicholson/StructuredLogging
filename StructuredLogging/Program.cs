@@ -27,7 +27,7 @@ namespace StructuredLogging
         /// The host name for RabbitMQ, which is the server name or IP address.
         /// We use this to connect the the worker queue, and for publishing to EventAnalysisAPI exchange.
         /// </summary>
-        private static readonly string EntityName = ConfigurationManager.AppSettings["EntityName"] ?? "Set app.config EntityName to the customer's name please.";
+        private static readonly string EntityName = ConfigurationManager.AppSettings["EntityName"] ?? "TEST";
 
         /// <summary>
         /// The my log message.
@@ -42,7 +42,12 @@ namespace StructuredLogging
         /// </param>
         public static void Main(string[] args)
         {
+            LogSamples();
             LogInfo();
+            LogErrors();
+            LogFatals();
+            LogWarn();
+            // LogObjects();
             Console.ReadLine();
         }
 
@@ -77,8 +82,6 @@ namespace StructuredLogging
 
         private static void LogInfo()
         {
-            var tz = TimeZoneInfo.GetSystemTimeZones();
-
             // You can use a correlationId to batch log messages together when a series of actions
             // represent the same unit of work.  If you are processing data, scrubbing, transforming
             // and inserting these types of transactions have many steps and could post the data to many
@@ -89,30 +92,59 @@ namespace StructuredLogging
                     correlationId: correlationId,
                     methodName: "Program.LogInfoMethod",
                     message: "Running LogInfo Test",
-                    error: "IF ONE EXISTS",
-                    stackTrace: "IF YOU WANT IT",
-                    exception: new Exception("Test Exception"),
-                    elapsedMilliseconds: 0,
-                    anyObject: tz));
+                    elapsedMilliseconds: 0));
         }
 
         private static void LogErrors()
         {
-
+            var correlationId = new Guid().ToString();
+            Logger.Error(
+                MyLogMessage.GetMessage(
+                    correlationId: correlationId,
+                    methodName: "Program.LogErrors",
+                    message: "Running LogErrors Test",
+                    error: "IF ONE EXISTS",
+                    stackTrace: "IF YOU WANT IT",
+                    exception: new Exception("Test Exception")));
         }
 
         private static void LogFatals()
         {
-
+            var correlationId = new Guid().ToString();
+            Logger.Fatal(
+                MyLogMessage.GetMessage(
+                    correlationId: correlationId,
+                    methodName: "Program.LogFatals",
+                    message: "Running LogFatals Test",
+                    elapsedMilliseconds: 0));
         }
         private static void LogObjects()
         {
+            var tz = TimeZoneInfo.GetSystemTimeZones();
 
+            // You can use a correlationId to batch log messages together when a series of actions
+            // represent the same unit of work.  If you are processing data, scrubbing, transforming
+            // and inserting these types of transactions have many steps and could post the data to many
+            // systems and know what is affected down stream is help full.
+            var correlationId = new Guid().ToString();
+            Logger.Info(
+                MyLogMessage.GetMessage(
+                    correlationId: correlationId,
+                    methodName: "Program.LogObjects",
+                    message: "Running LogObjects Test",
+                    elapsedMilliseconds: 0,
+                    anyObject: tz));
         }
 
         private static void LogWarn()
         {
-
+            var correlationId = new Guid().ToString();
+            Logger.Warn(
+                MyLogMessage.GetMessage(
+                    correlationId: correlationId,
+                    methodName: "Program.LogWarn",
+                    message: "Running LogWarn Test",
+                    elapsedMilliseconds: 0));
         }
     }
 }
