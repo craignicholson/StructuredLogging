@@ -152,11 +152,104 @@ https://logging.apache.org/log4net/release/manual/introduction.html#appenders
 
 Install Docker and download the ELK Stack
 
+```bash
 > docker pull sebp/elk
+Using default tag: latest
+latest: Pulling from sebp/elk
+Digest: sha256:37c37158a55218af97d182b88ffdbba44fb2827060ca3b0082f7caf3ad77c762
+Status: Image is up to date for sebp/elk:latest
+```
+
+You can view the images with this command.
+
+```bash
 > docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+sebp/elk            latest              b0dc4bffd033        3 weeks ago         1.07GB
+```
+
+Run the stack.  This will get you up and running locally.
+up as long as you keep this terminal open.  TODO: show the way to run this ... and not see the output. headless.
+
+You can run this command after you have installed filebeat.  Depending on your machine docker might be expensize to run.
+
+```bash
 > docker run -p 5601:5601 -p 9200:9200 -p 5044:5044 -it --name elk sebp/
+
+ * Starting periodic command scheduler cron                                                                                                                                              [ OK ]
+ * Starting Elasticsearch Server                                                                                                                                                         [ OK ]
+waiting for Elasticsearch to be up (1/30)
+waiting for Elasticsearch to be up (2/30)
+waiting for Elasticsearch to be up (3/30)
+waiting for Elasticsearch to be up (4/30)
+waiting for Elasticsearch to be up (5/30)
+Waiting for Elasticsearch cluster to respond (1/30)
+logstash started.
+ * Starting Kibana5                                                                                                                                                                      [ OK ]
+==> /var/log/elasticsearch/elasticsearch.log <==
+[2018-01-18T01:03:10,167][INFO ][o.e.d.DiscoveryModule    ] [FijewPo] using discovery type [zen]
+[2018-01-18T01:03:10,532][INFO ][o.e.n.Node               ] initialized
+[2018-01-18T01:03:10,533][INFO ][o.e.n.Node               ] [FijewPo] starting ...
+[2018-01-18T01:03:10,629][INFO ][o.e.t.TransportService   ] [FijewPo] publish_address {172.17.0.2:9300}, bound_addresses {0.0.0.0:9300}
+[2018-01-18T01:03:10,636][INFO ][o.e.b.BootstrapChecks    ] [FijewPo] bound or publishing to a non-loopback or non-link-local address, enforcing bootstrap checks
+[2018-01-18T01:03:13,679][INFO ][o.e.c.s.MasterService    ] [FijewPo] zen-disco-elected-as-master ([0] nodes joined), reason: new_master {FijewPo}{FijewPoYTTC32sTUGYue-g}{iSi9kftzR7mL7its4nBFyw}{172.17.0.2}{172.17.0.2:9300}
+[2018-01-18T01:03:13,683][INFO ][o.e.c.s.ClusterApplierService] [FijewPo] new_master {FijewPo}{FijewPoYTTC32sTUGYue-g}{iSi9kftzR7mL7its4nBFyw}{172.17.0.2}{172.17.0.2:9300}, reason: apply cluster state (from master [master {FijewPo}{FijewPoYTTC32sTUGYue-g}{iSi9kftzR7mL7its4nBFyw}{172.17.0.2}{172.17.0.2:9300} committed version [1] source [zen-disco-elected-as-master ([0] nodes joined)]])
+[2018-01-18T01:03:13,693][INFO ][o.e.h.n.Netty4HttpServerTransport] [FijewPo] publish_address {172.17.0.2:9200}, bound_addresses {0.0.0.0:9200}
+[2018-01-18T01:03:13,693][INFO ][o.e.n.Node               ] [FijewPo] started
+[2018-01-18T01:03:13,713][INFO ][o.e.g.GatewayService     ] [FijewPo] recovered [0] indices into cluster_state
+
+==> /var/log/logstash/logstash-plain.log <==
+
+==> /var/log/kibana/kibana5.log <==
+{"type":"log","@timestamp":"2018-01-18T01:03:19Z","tags":["status","plugin:kibana@6.1.1","info"],"pid":190,"state":"green","message":"Status changed from uninitialized to green - Ready","prevState":"uninitialized","prevMsg":"uninitialized"}
+{"type":"log","@timestamp":"2018-01-18T01:03:19Z","tags":["status","plugin:elasticsearch@6.1.1","info"],"pid":190,"state":"yellow","message":"Status changed from uninitialized to yellow - Waiting for Elasticsearch","prevState":"uninitialized","prevMsg":"uninitialized"}
+{"type":"log","@timestamp":"2018-01-18T01:03:19Z","tags":["status","plugin:console@6.1.1","info"],"pid":190,"state":"green","message":"Status changed from uninitialized to green - Ready","prevState":"uninitialized","prevMsg":"uninitialized"}
+{"type":"log","@timestamp":"2018-01-18T01:03:19Z","tags":["status","plugin:metrics@6.1.1","info"],"pid":190,"state":"green","message":"Status changed from uninitialized to green - Ready","prevState":"uninitialized","prevMsg":"uninitialized"}
+{"type":"log","@timestamp":"2018-01-18T01:03:19Z","tags":["status","plugin:timelion@6.1.1","info"],"pid":190,"state":"green","message":"Status changed from uninitialized to green - Ready","prevState":"uninitialized","prevMsg":"uninitialized"}
+{"type":"log","@timestamp":"2018-01-18T01:03:19Z","tags":["listening","info"],"pid":190,"message":"Server running at http://0.0.0.0:5601"}
+{"type":"log","@timestamp":"2018-01-18T01:03:19Z","tags":["status","plugin:elasticsearch@6.1.1","info"],"pid":190,"state":"green","message":"Status changed from yellow to green - Ready","prevState":"yellow","prevMsg":"Waiting for Elasticsearch"}
+
+==> /var/log/logstash/logstash-plain.log <==
+[2018-01-18T01:03:31,557][INFO ][logstash.modules.scaffold] Initializing module {:module_name=>"netflow", :directory=>"/opt/logstash/modules/netflow/configuration"}
+[2018-01-18T01:03:31,567][INFO ][logstash.modules.scaffold] Initializing module {:module_name=>"fb_apache", :directory=>"/opt/logstash/modules/fb_apache/configuration"}
+[2018-01-18T01:03:31,626][INFO ][logstash.setting.writabledirectory] Creating directory {:setting=>"path.queue", :path=>"/opt/logstash/data/queue"}
+[2018-01-18T01:03:31,629][INFO ][logstash.setting.writabledirectory] Creating directory {:setting=>"path.dead_letter_queue", :path=>"/opt/logstash/data/dead_letter_queue"}
+[2018-01-18T01:03:31,921][WARN ][logstash.config.source.multilocal] Ignoring the 'pipelines.yml' file because modules or command line options are specified
+[2018-01-18T01:03:31,951][INFO ][logstash.agent           ] No persistent UUID file found. Generating new UUID {:uuid=>"842b7c4f-04e3-45c8-84b5-605f3c14c9d0", :path=>"/opt/logstash/data/uuid"}
+[2018-01-18T01:03:32,420][INFO ][logstash.runner          ] Starting Logstash {"logstash.version"=>"6.1.1"}
+[2018-01-18T01:03:32,776][INFO ][logstash.agent           ] Successfully started Logstash API endpoint {:port=>9600}
+[2018-01-18T01:03:35,705][WARN ][logstash.outputs.elasticsearch] You are using a deprecated config setting "document_type" set in elasticsearch. Deprecated settings will continue to work, but are scheduled for removal from logstash in the future. Document types are being deprecated in Elasticsearch 6.0, and removed entirely in 7.0. You should avoid this feature If you have any questions about this, please visit the #logstash channel on freenode irc. {:name=>"document_type", :plugin=><LogStash::Outputs::ElasticSearch hosts=>[//localhost], manage_template=>false, index=>"%{[@metadata][beat]}-%{+YYYY.MM.dd}", document_type=>"%{[@metadata][type]}", id=>"225ede8330c8baf0f6dca5ad1692f2bdbe28641f42e6c0a0a5af6323ae7b3954", enable_metric=>true, codec=><LogStash::Codecs::Plain id=>"plain_2be8607a-a135-4d96-a03a-c11542b0d4fe", enable_metric=>true, charset=>"UTF-8">, workers=>1, template_name=>"logstash", template_overwrite=>false, doc_as_upsert=>false, script_type=>"inline", script_lang=>"painless", script_var_name=>"event", scripted_upsert=>false, retry_initial_interval=>2, retry_max_interval=>64, retry_on_conflict=>1, action=>"index", ssl_certificate_verification=>true, sniffing=>false, sniffing_delay=>5, timeout=>60, pool_max=>1000, pool_max_per_route=>100, resurrect_delay=>5, validate_after_inactivity=>10000, http_compression=>false>}
+[2018-01-18T01:03:36,155][INFO ][logstash.outputs.elasticsearch] Elasticsearch pool URLs updated {:changes=>{:removed=>[], :added=>[http://localhost:9200/]}}
+[2018-01-18T01:03:36,165][INFO ][logstash.outputs.elasticsearch] Running health check to see if an Elasticsearch connection is working {:healthcheck_url=>http://localhost:9200/, :path=>"/"}
+[2018-01-18T01:03:36,361][WARN ][logstash.outputs.elasticsearch] Restored connection to ES instance {:url=>"http://localhost:9200/"}
+[2018-01-18T01:03:36,490][INFO ][logstash.outputs.elasticsearch] ES Output version determined {:es_version=>nil}
+[2018-01-18T01:03:36,492][WARN ][logstash.outputs.elasticsearch] Detected a 6.x and above cluster: the `type` event field won't be used to determine the document _type {:es_version=>6}
+[2018-01-18T01:03:36,520][INFO ][logstash.outputs.elasticsearch] New Elasticsearch output {:class=>"LogStash::Outputs::ElasticSearch", :hosts=>["//localhost"]}
+[2018-01-18T01:03:36,718][INFO ][logstash.pipeline        ] Starting pipeline {:pipeline_id=>"main", "pipeline.workers"=>2, "pipeline.batch.size"=>125, "pipeline.batch.delay"=>5, "pipeline.max_inflight"=>250, :thread=>"#<Thread:0x5b9a96c2 run>"}
+[2018-01-18T01:03:37,099][INFO ][logstash.inputs.beats    ] Beats inputs: Starting input listener {:address=>"0.0.0.0:5044"}
+[2018-01-18T01:03:37,165][INFO ][logstash.pipeline        ] Pipeline started {"pipeline.id"=>"main"}
+[2018-01-18T01:03:37,288][INFO ][logstash.agent           ] Pipelines running {:count=>1, :pipelines=>["main"]}
+[2018-01-18T01:03:37,370][INFO ][org.logstash.beats.Server] Starting server on port: 5044
+```
+
+Now you should be able to reach kibaba: http://localhost:5601/app/kibana#/home?_g=()
+
+You can click the Discover on the RIGHT side of the web page and click Check for New data in the middle of the web page.
+
+Review what processes are running in docker.  You can use this to get the container's name.
+
+```bash
 > docker ps
-> docker stop my_container
+```
+
+Stop you container - For later.  Remove the container.
+
+```bash
+> docker stop elk
+> docker rm containerId
+```
+
+Save the data for elastic search
 
 - [Install Filebeat](https://www.elastic.co/downloads/beats/filebeat)
 
@@ -246,7 +339,18 @@ output.elasticsearch:
 
 ```
 
+> PS C:\WINDOWS\system32> Start-Service filebeat
+
+You can review the filebeat log to see if it started successfully.
+
+C:\ProgramData\filebeat\logs
+
+Here is what success looks like...
+
+Here is what failure looks like...
+
 ### Install for Production on Windows Server
+
 
 1. Download and install Filebeat
 
@@ -265,60 +369,10 @@ output.elasticsearch:
 
 Edit Filebeat yml
 
-
 > cd C:\Users\craig\Downloads\filebeat-6.1.1-windows-x86_64\filebeat-6.1.1-windows-x86_64
 > install-service-filebeat.pd1
 
 Edit the filebeat .yml
-
-> Start-Service filebeat
-> Stop-Service filebeat
-C:\ProgramData\filebeat\logs
-
-PS C:\Users\craig\Downloads\filebeat-6.1.1-windows-x86_64\filebeat-6.1.1-windows-x86_64> history
-
-  Id CommandLine
-  -- -----------
-   1 curl -XGET 'localhost:9600/_node/logging?pretty'
-   2 cd C:\Users\craig\Downloads\filebeat-6.1.1-windows-x86_64\filebeat-6.1.1-windows-x86_64
-   3 service filebeat start
-   4 ls
-   5 ./filebeat.exe start
-   6 Start-Service filebeat
-   7 history
-   8 docker ps
-   9 docker images
-  10 docker ps
-  11 docker stop elk
-  12 docker ps
-  13 docker images
-
-PS C:\Users\craig\Downloads\filebeat-6.1.1-windows-x86_64\filebeat-6.1.1-windows-x86_64> history
-
-  Id CommandLine
-  -- -----------
-   1 Set-ExecutionPolicy Unrestricted
-   2 cd C:\Users\craig\Downloads\filebeat-6.1.1-windows-x86_64\filebeat-6.1.1-windows-x86_64
-   3 .\install-service-filebeat.ps1
-   4 Service-Start filebeat
-   5 Start-Serivce filebeat
-   6 Start-Service
-   7 Start-Service filebeat
-   8 Stop-Service filebeat
-   9 Invoke-RestMethod -Method Delete "http://localhost:9200/filebeat-*"...
-  10 Stop-Service filebeat
-  11 Start-Service filebeat
-  12 Stop-Service filebeat
-  13 Start-Service filebeat
-  14 Stop-Service filebeat
-  15 Invoke-RestMethod DELETE 'http://localhost:9200/_all'
-  16 Invoke-RestMethod DELETE "http://localhost:9200/_all"
-  17 Start-Service filebeat
-  18 Stop-Service filebeat
-  19 Start-Service filebeat
-  20 Stop-Service filebeat
-
-
 
 ### Filebeat
 
