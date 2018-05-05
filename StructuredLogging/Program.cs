@@ -12,6 +12,7 @@ namespace StructuredLogging
     using System;
     using System.Collections.ObjectModel;
     using System.Configuration;
+    using System.Threading;
 
     /// <summary>
     /// The program.
@@ -27,7 +28,7 @@ namespace StructuredLogging
         /// The host name for RabbitMQ, which is the server name or IP address.
         /// We use this to connect the the worker queue, and for publishing to EventAnalysisAPI exchange.
         /// </summary>
-        private static readonly string EntityName = ConfigurationManager.AppSettings["EntityName"] ?? "TEST";
+        private static readonly string EntityName = ConfigurationManager.AppSettings["EntityName"] ?? "Ephrata";
 
         /// <summary>
         /// The my log message.
@@ -42,12 +43,17 @@ namespace StructuredLogging
         /// </param>
         public static void Main(string[] args)
         {
-            LogSamples();
-            LogInfo();
-            LogErrors();
-            LogFatals();
-            LogWarn();
-            // LogObjects();
+            for (var i = 0; i < 100; i++)
+            {
+                LogSamples();
+                LogInfo();
+                LogErrors();
+                LogFatals();
+                LogWarn();
+                Thread.Sleep(1000);
+            }
+            LogObjects();
+
             Console.ReadLine();
         }
 

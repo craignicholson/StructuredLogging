@@ -423,12 +423,12 @@ Edit the filebeat .yml
 
 ## Additional Log Aggreation Tools
 
-https://coralogix.com/integrations/coralogix-logstash-integration/
-https://logentries.com/
-https://www.loggly.com/docs/net-logs/
-https://nxlog.co/documentation/nxlog-user-guide#what-nxlog-is-not - fowards logs to aggregation UI - like loggly
-https://stackify.com/best-log-management-tools/
-https://stackify.com/csharp-logging-best-practices/
+- https://coralogix.com/integrations/coralogix-logstash-integration/
+- https://logentries.com/
+- https://www.loggly.com/docs/net-logs/
+- https://nxlog.co/documentation/nxlog-user-guide#what-nxlog-is-not - fowards logs to aggregation UI - like loggly
+- https://stackify.com/best-log-management-tools/
+- https://stackify.com/csharp-logging-best-practices/
 
 ## Referennces
 
