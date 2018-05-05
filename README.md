@@ -151,6 +151,8 @@ https://logging.apache.org/log4net/release/manual/introduction.html#appenders
 ### [Install Docker](https://docs.docker.com/docker-for-windows/install/)
 
 Install Docker and download the ELK Stack
+https://elk-docker.readthedocs.io/
+
 
 ```bash
 > docker pull sebp/elk
@@ -173,8 +175,33 @@ up as long as you keep this terminal open.  TODO: show the way to run this ... a
 
 You can run this command after you have installed filebeat.  Depending on your machine docker might be expensize to run.
 
+Install Filebeat as a service
+
 ```bash
-> docker run -p 5601:5601 -p 9200:9200 -p 5044:5044 -it --name elk sebp/
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+PS C:\WINDOWS\system32> cd C:\Users\craig\Downloads\filebeat-6.1.1-windows-x86_64\filebeat-6.1.1-windows-x86_64
+PS C:\Users\craig\Downloads\filebeat-6.1.1-windows-x86_64\filebeat-6.1.1-windows-x86_64> .\install-service-filebeat.ps1
+
+Security warning
+Run only scripts that you trust. While scripts from the internet can be useful, this script can potentially harm your
+computer. If you trust this script, use the Unblock-File cmdlet to allow the script to run without this warning
+message. Do you want to run
+C:\Users\craig\Downloads\filebeat-6.1.1-windows-x86_64\filebeat-6.1.1-windows-x86_64\install-service-filebeat.ps1?
+[D] Do not run  [R] Run once  [S] Suspend  [?] Help (default is "D"): R
+
+Status   Name               DisplayName
+------   ----               -----------
+Stopped  filebeat           filebeat
+
+
+PS C:\Users\craig\Downloads\filebeat-6.1.1-windows-x86_64\filebeat-6.1.1-windows-x86_64> Start-Service filebeat
+
+```
+
+```bash
+> docker run -p 5601:5601 -p 9200:9200 -p 5044:5044 -it --name elk sebp/elk
 
  * Starting periodic command scheduler cron                                                                                                                                              [ OK ]
  * Starting Elasticsearch Server                                                                                                                                                         [ OK ]
@@ -256,6 +283,22 @@ Save the data for elastic search
 1. Unzip the packatge you downloaded (filebeat-6.1.1-windows-x86_64.zip)
 1. Run Powershell as Administrator on install-service-filebeat.ps1
 1. Create a filebeat.yml or edit the existing file. TODO: Create folder of sample filebeat.yml files.
+
+
+Enable Shared Drives in Docker requires system pwd
+docker run --rm -v c:/Users:/data alpine ls /data
+docker run --rm -v C:/Users/craig/Downloads:/data alpine ls /data
+
+docker run --rm -v C:/Users/craig/Downloads/conf/craig-30-output.conf:/tmp/craig-30-output.conf alpine ls /tmp
+docker run --rm -v C:/Users/craig/Downloads/conf/craig-30-output.conf:/tmp/craig-30-output.conf alpine cat /tmp/craig-30-output.conf
+
+docker run --rm -v C:/Users/craig/Downloads/conf/craig-30-output.conf:/etc/30-output.conf alpine ls /etc
+
+
+docker run -p 5601:5601 -p 9200:9200 -p 5044:5044 -it --name elk sebp/elk
+docker run -p 5601:5601 -p 9200:9200 -p 5044:5044 -v C:/Users/craig/Downloads/conf/craig-30-output.conf:/etc/logstash/conf.d/30-output.conf \ -it --name elk sebp/elk
+
+docker run -p 5601:5601 -p 9200:9200 -p 5044:5044 -it --name elk sebp/elk -v C:/Users/craig/Downloads/conf/craig-30-output.conf:/etc/logstash/conf.d/30-output.conf
 
 ```yml
 #=========================== Filebeat prospectors =============================
@@ -390,3 +433,9 @@ https://stackify.com/csharp-logging-best-practices/
 ## Referennces
 
 https://blog.rapid7.com/2016/04/27/how-to-ensure-self-describing-log-data-using-log4net/
+
+IIS
+https://www.elastic.co/guide/en/beats/libbeat/current/logstash-installation.html#logstash-setup
+https://stackoverflow.com/questions/38352655/logstash-and-x-forwarded-for-on-iis
+http://robwillis.info/2017/05/elk-5-setting-up-a-grok-filter-for-iis-logs/
+https://discuss.elastic.co/t/filebeat-windows-config-help-filebeat-yml/52656
